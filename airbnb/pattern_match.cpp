@@ -47,7 +47,7 @@ bool backtrack(
   return false;
 }
 
-bool patterMatch(string s, string p) {
+bool patternMatch(string s, string p) {
   unordered_map<char, string> tbl;
   return backtrack(s, p, tbl);
 }
@@ -59,7 +59,7 @@ int main() {
     string s = "aabbcc";
     string t = "xyz";
 
-    cout << patterMatch(s, t) << endl;
+    cout << patternMatch(s, t) << endl;
   }
   {
     // TEST 2
@@ -67,6 +67,6 @@ int main() {
     string s = "airbnbairbn";
     string t = "xyzxy";
 
-    cout << patterMatch(s, t) << endl;
+    cout << patternMatch(s, t) << endl;
   }
 }
