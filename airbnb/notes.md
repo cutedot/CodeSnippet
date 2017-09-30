@@ -2,12 +2,14 @@
 -------
 1. pop item from queue:
 ```cpp
-item = q.***front()***;
+// this is FIFO queue so push to back and pop from front
+item = q.front();
 q.pop();
 ```
 
 pop item from stack:
 ```cpp
-item = q.***top()***;
+// stack always push to the top and pop from the top
+item = q.top();
 q.pop();
 ```

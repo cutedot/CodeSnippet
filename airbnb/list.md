@@ -13,7 +13,7 @@
 - [ ] MaximumSquare
 - [ ] RegularExpression
 - [ ] StringPyramidsTransitionMatrix
-- [ ] CircularBuffer
+- [x] CircularBuffer
 - [ ] FileSystem
 - [ ] Puzzle
 - [ ] TwoDIterator
