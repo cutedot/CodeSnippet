@@ -10,7 +10,7 @@
 - [ ] MenuCombinationSum
 - [ ] WizardsDistance
 - [x] HouseRobberWithIndex
-- [ ] MaximumSquare
+- [x] MaximumSquare
 - [x] RegularExpression
 - [ ] StringPyramidsTransitionMatrix
 - [x] CircularBuffer

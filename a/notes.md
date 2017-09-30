@@ -1,4 +1,4 @@
-# Notes on Airbnb Interview
+# Just a list of stupid mistakes
 -------
 1. pop item from queue:
 ```cpp
@@ -13,3 +13,5 @@ pop item from stack:
 item = q.top();
 q.pop();
 ```
+
+2. be careful about reference &
