@@ -1,4 +1,4 @@
-# List of A company interview questions
+# List of some interesting interview questions
 ---
 
 - [ ] AlienDictionary
