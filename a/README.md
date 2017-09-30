@@ -11,7 +11,7 @@
 - [ ] WizardsDistance
 - [x] HouseRobberWithIndex
 - [ ] MaximumSquare
-- [ ] RegularExpression
+- [x] RegularExpression
 - [ ] StringPyramidsTransitionMatrix
 - [x] CircularBuffer
 - [ ] FileSystem
