@@ -2,9 +2,9 @@
 ---
 
 - [ ] AlienDictionary
-- [ ] PreferenceList
+- [x] PreferenceList
 - [x] BoggleGame
-- [ ] FlightTicket
+- [x] FlightTicket
 - [ ] FloodFill
 - [ ] HilbertCurve
 - [ ] MenuCombinationSum
