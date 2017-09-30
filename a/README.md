@@ -1,4 +1,4 @@
-# List of Airbnb interview questions
+# List of A company interview questions
 ---
 
 - [ ] AlienDictionary
@@ -9,7 +9,7 @@
 - [ ] HilbertCurve
 - [ ] MenuCombinationSum
 - [ ] WizardsDistance
-- [ ] HouseRobberWithIndex
+- [x] HouseRobberWithIndex
 - [ ] MaximumSquare
 - [ ] RegularExpression
 - [ ] StringPyramidsTransitionMatrix
