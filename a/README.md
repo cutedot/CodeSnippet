@@ -23,7 +23,7 @@
 - [ ] TextJustification
 - [ ] TravelBuddyList
 - [ ] WaterLand
-- [ ] MeetingRooms
+- [x] MeetingRooms
 - [ ] MinimumNumberOfGraphNode
 - [ ] NumberOfConnectedComponents
 - [ ] RectangleIntersections
