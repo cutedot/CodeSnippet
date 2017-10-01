@@ -27,7 +27,7 @@
 - [ ] MinimumNumberOfGraphNode
 - [ ] NumberOfConnectedComponents
 - [ ] RectangleIntersections
-- [ ] PalindromePairs
+- [x] PalindromePairs
 - [ ] CalculatorII
 - [ ] GuessNumber
 - [ ] MiniParser
