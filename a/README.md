@@ -5,10 +5,10 @@
 - [x] PreferenceList
 - [x] BoggleGame
 - [x] FlightTicket
-- [ ] FloodFill
+- [x] FloodFill
 - [ ] HilbertCurve
-- [ ] MenuCombinationSum
-- [ ] WizardsDistance
+- [x] MenuCombinationSum
+- [x] WizardsDistance
 - [x] HouseRobberWithIndex
 - [x] MaximumSquare
 - [x] RegularExpression
@@ -16,7 +16,7 @@
 - [x] CircularBuffer
 - [ ] FileSystem
 - [ ] Puzzle
-- [ ] TwoDIterator
+- [x] TwoDIterator
 - [ ] CSVParser
 - [ ] DisplayPageList
 - [ ] IPtoCidr
@@ -28,9 +28,9 @@
 - [ ] NumberOfConnectedComponents
 - [ ] RectangleIntersections
 - [x] PalindromePairs
-- [ ] CalculatorII
+- [x] CalculatorII
 - [ ] GuessNumber
-- [ ] MiniParser
+- [x] MiniParser
 - [ ] RoundedNumber
 - [x] PatternMatch
 - [ ] RotateBinaryTree
