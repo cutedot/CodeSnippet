@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <cassert>
+#include <chrono>
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
@@ -81,6 +82,14 @@ public:
     }
   }
 
+public:
+  Puzzle &operator=(const Puzzle &that) {
+    board = that.board;
+    x = that.x;
+    y = that.y;
+    return *this;
+  }
+
 public: // play the game
   // try to move the empty slot, return if the empty slot is moved
   bool move(Dir d) {
@@ -135,8 +144,8 @@ public: // puzzle solver
   // BRUTE-FORCE BFS SOLVER : get things done in a stupid way
   // solve the puzzle by moving the board back to the original state
   // TODO: quite a few places to improve:
-  //        - too many object copy
-  //        - should be able to do it in-place
+  //        - too many object copy (but seems inevitable?)
+  //        - can it be done in-place?
   vector<Dir> naive_solve() {
     // use try BFS to solve this problem
     queue<Puzzle> q; // put the string representation in the queue
@@ -154,12 +163,6 @@ public: // puzzle solver
       cur = tbl[p.boardToString()]; // path to current state
       // check if it is valid
       if (p.validBoard()) {
-        // cout << "Found A Path" << endl;
-        // for (auto d : tbl[p.boardToString()]) {
-        //  cout << d << endl;
-        //}
-        // p.printBoard();
-
         return cur;
       }
       // try to move for different directions
@@ -181,17 +184,32 @@ public: // puzzle solver
     }
     return vector<Dir>();
   }
-
+  // TODO: fix this ...
+  // A* solver
+  // the heuristics is the sum of square diff of each slot in board
   int distance() {
-    return (D - 1 - x) * (D - 1 - x) + (D - 1 - y) * (D - 1 - y);
+    // return (D - 1 - x) * (D - 1 - x) + (D - 1 - y) * (D - 1 - y);
+    int dist = 0;
+    for (int i = 0; i < D; ++i) {
+      for (int j = 0; j < D; ++j) {
+        int diff = board[i][j] - (i * D + j);
+        dist += diff * diff;
+      }
+    }
+    return dist;
   }
-
-// TODO: fix this ...
-// A* solver
-#if 0
+  // comparator function
+  struct cmp {
+    bool operator()(Puzzle &lhs, Puzzle &rhs) {
+      return lhs.distance() > rhs.distance();
+    }
+  };
+  // A* seach, using a priority queue instead of queue.
+  // Every time pops up the item that has smaller distance from a valid board.
   vector<Dir> astar_solve() {
     // use try BFS to solve this problem
-    priority_queue<Puzzle> q; // put the string representation in the queue
+    priority_queue<Puzzle, vector<Puzzle>, cmp>
+        q; // put the string representation in the queue
     unordered_map<string, vector<Dir>>
         tbl; // keep track of all visited puzzle board
     q.push(*this);
@@ -206,12 +224,6 @@ public: // puzzle solver
       cur = tbl[p.boardToString()]; // path to current state
       // check if it is valid
       if (p.validBoard()) {
-        // cout << "Found A Path" << endl;
-        // for (auto d : tbl[p.boardToString()]) {
-        //  cout << d << endl;
-        //}
-        // p.printBoard();
-
         return cur;
       }
       // try to move for different directions
@@ -233,7 +245,7 @@ public: // puzzle solver
     }
     return vector<Dir>();
   }
-#endif
+
 private: // data
   // board
   vector<vector<int>> board;
@@ -244,21 +256,32 @@ private: // data
 
 int main() {
   {
-    // this is a solvable board
-    // string rep = "041382675";
-    // Puzzle pz(rep);
+    Puzzle pz(rand() % 10000000);
     // Puzzle pz;
-    Puzzle pz(rand() % 10000);
     pz.printBoard();
 
-    vector<Dir> res = pz.naive_solve();
+    auto t0 = chrono::high_resolution_clock::now();
+    vector<Dir> res1 = pz.naive_solve();
+    auto t1 = chrono::high_resolution_clock::now();
 
-    for (auto d : res) {
+    auto t2 = chrono::high_resolution_clock::now();
+    vector<Dir> res2 = pz.astar_solve();
+    auto t3 = chrono::high_resolution_clock::now();
+
+    cout << "Time measured : " << endl;
+    cout << "Naive BFS : Lenght " << res1.size() << " in "
+         << std::chrono::duration_cast<std::chrono::seconds>(t1 - t0).count()
+         << " seconds" << endl;
+    cout << "Astar BFS : Lenght " << res2.size() << " in "
+         << std::chrono::duration_cast<std::chrono::seconds>(t3 - t2).count()
+         << " seconds" << endl;
+
+    for (auto d : res1) {
       assert(pz.move(d));
     }
     if (pz.validBoard()) {
       cout << ">>> Solution <<<" << endl;
-      for (auto d : res) {
+      for (auto d : res1) {
         cout << dir_name[d] << endl;
       }
 
