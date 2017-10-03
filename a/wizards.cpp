@@ -1,3 +1,4 @@
+#include <cassert>
 #include <iostream>
 #include <queue>
 #include <vector>
@@ -34,38 +35,46 @@ int bellmanFord(vector<vector<int>> wizards) {
   return d[nWizard - 1];
 }
 
-// TODO: finish Dijkstra
-/*
-bool Comparator(pair<int, int> &a, pair<int, int> &b) {
-  return a.second > b.second;
-}
+int find_min(vector<int> &d, vector<bool> &visited) {
+  int ret;
+  int min_val = INT_MAX;
 
-int dijkstra(vector<vector<int>> wizards) {
-  vector<int> d(nWizard, INT_MAX); // distance from 0
-  // min-heap
-  priority_queue<pair<int, int>, vector<pair<int, int>>, Comparator>
-      pq; // <wiz, dist> pair
-  int nWizard = wizards.size();
-
-  // init
-  pq.push(make_pair<int, int>(0, 0));
-  d[0] = 0;
-
-  while (pq.size() > 0) {
-    auto p = pq.top();
-    pq.pop();
-
-    int u = p.first;
-    for (auto v : wizards[u]) {
-      // relax u->v
-      if (d[v] > d[u] + getWeight(u, v)) {
-        d[v] = d[u] + getWeight(u, v);
-      }
+  for (int i = 0; i < d.size(); ++i) {
+    if (visited[i] == false && d[i] < min_val) {
+      ret = i;
+      min_val = d[i];
     }
   }
+  return ret;
 }
-*/
-int minDist(vector<vector<int>> wizards) { return bellmanFord(wizards); }
+
+// Dijkstra algorithm
+// Complexity : O(V^2)
+int dijkstra(vector<vector<int>> wizards) {
+  int nWizard = wizards.size();
+  vector<int> d(nWizard, INT_MAX);      // distance from 0
+  int num_visited = 0;                  // number of nodes visited
+  vector<bool> visited(nWizard, false); // tracking visited nodes
+  // init
+  d[0] = 0;
+
+  while (num_visited <= nWizard) {
+    int u = find_min(d, visited);
+    visited[u] = true;
+    ++num_visited;
+    for (auto v : wizards[u]) {
+      // relax u->v
+      relax(d, u, v);
+    }
+  }
+  return d[nWizard - 1];
+}
+
+int minDist(vector<vector<int>> wizards) {
+  // return bellmanFord(wizards);
+  assert(dijkstra(wizards) == bellmanFord(wizards));
+  return dijkstra(wizards);
+}
 
 int main() {
   {
