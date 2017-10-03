@@ -21,3 +21,57 @@ q.pop();
     - Next() just return the current item and initialize the move (not
       necessarily move the a valid item, but move to the next item blindly)
     - hasNext() do the navigation to the next ***valid*** item
+
+4. To use object in priority queue, need to provide copy assignment operator=.
+
+5. DFS template:
+```cpp
+dfs(u) {
+  visit(u);
+  for (auto i : u.neighbors()) {
+    visit(i)
+  }
+}
+```
+
+6. BFS template:
+```cpp
+queue<item> q;
+// initial item
+q.push(start);
+
+while (!q.empty()) {
+  i = q.top();
+  q.pop();
+
+  visite(q);
+
+  for (auto j : q.neighbors()) {
+    if (visited[j]) {
+      q.push(j);
+    }
+  }
+}
+```
+But keep in mind that what information you want to keep track of. Essentially
+you want to keep track of the current state of whatever item you are searching,
+so extra memory copy is inevitable.
+
+7. A\* template
+```cpp
+priority_queue<item> pq;
+pq.push(start);
+
+while (!pq.empty()) {
+  i = q.top();
+  q.pop();
+
+  visit(q);
+  
+  for (auto j : q.neighbors()) {
+    if (visited[j]) {
+      q.push(j);
+    }
+  }
+}
+```
