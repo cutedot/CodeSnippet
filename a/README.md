@@ -24,13 +24,13 @@
 - [ ] TravelBuddyList
 - [ ] WaterLand
 - [x] MeetingRooms
-- [ ] MinimumNumberOfGraphNode
+- [x] MinimumNumberOfGraphNode
 - [ ] NumberOfConnectedComponents
 - [ ] RectangleIntersections
 - [x] PalindromePairs
 - [ ] CalculatorII
 - [ ] GuessNumber
-- [ ] MiniParser
+- [x] MiniParser
 - [ ] RoundedNumber
 - [x] PatternMatch
 - [ ] RotateBinaryTree
