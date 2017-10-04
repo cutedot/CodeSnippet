@@ -1,4 +1,8 @@
-#include <experimental/filesystem>
+#include <boost/filesystem.hpp>
+#include <cstdlib>
+#include <cstring>
+#include <iostream>
+#include <string>
 #include <unordered_map>
 #include <vector>
 //
@@ -6,12 +10,11 @@
 // NOTE: this is not POSIX compatible
 //
 using namespace std;
-namespace fs = std::experimental::filesystem;
+namespace fs = boost::filesystem;
 
 class FileSystem {
 public: // file system essentials
   enum TYPE { FILE_TYPE = 0, DIR_TYPE = 1 };
-  const BLOCK_SIZE = 64 * 1024; // 64k
 
   struct iNode {
   public:
@@ -22,7 +25,7 @@ public: // file system essentials
     ~iNode() {}
 
     bool is_dir() const { return type_ == DIR_TYPE; }
-    string &get_name() const { return name_; }
+    string &get_name() { return name_; }
 
   private:
     // type of the node
@@ -68,8 +71,7 @@ public: // file system essentials
         char *new_data = new char[offset + n];
         // copy existing data over
         memcpy(new_data, data_, size_);
-        // write new data
-        memcpy(new_data + offset, buf, n);
+
         // update the size
         size_ = offset + n;
 
@@ -78,17 +80,28 @@ public: // file system essentials
         }
         data_ = new_data;
       }
+      // write new data
+      memcpy(data_ + offset, buf, n);
+      return true;
     }
 
   private:
-    int size_;    // current file size
-    char *data__; // content of the file
+    int size_;   // current file size
+    char *data_; // content of the file
   };
 
   struct Dir : public iNode {
   public: // C-tor
-    Dir(const string &dirname) : iNode(TYPE_DIR, dirname) {}
-    ~Dir() {}
+    Dir(const string &dirname) : iNode(DIR_TYPE, dirname) {}
+    ~Dir() {
+      for (auto d : dir_tbl_) {
+        if (d.second->is_dir()) {
+          delete static_cast<Dir *>(d.second);
+        } else {
+          delete static_cast<File *>(d.second);
+        }
+      }
+    }
 
   public:
     iNode *search(string name) {
@@ -100,7 +113,9 @@ public: // file system essentials
     }
     bool add(string name, iNode *item) {
       if (dir_tbl_.find(name) == dir_tbl_.end()) {
+        cout << name << endl;
         dir_tbl_[name] = item;
+        return true;
       } else {
         return false; // already exist
       }
@@ -111,8 +126,9 @@ public: // file system essentials
       if (dir_tbl_.find(name) == dir_tbl_.end()) {
         return false;
       } else {
-        del dir_tbl_[name];
+        delete dir_tbl_[name];
         dir_tbl_.erase(name);
+        return true;
       }
     }
 
@@ -124,25 +140,28 @@ public: // file system essentials
 private:
   // recursively destroy the file system
   //  - delete all files / directories
-  void destroy(iNode *root) {}
+  void destroy(iNode *root) { delete static_cast<Dir *>(root_); }
 
   // navigate to a directory
-  bool navigate(const string &dirpath, iNode **leaf, iNode **parent_dir,
+  bool navigate(const string &dirname, iNode **leaf, iNode **parent_dir,
                 bool create_if_missing) {
-    fs::path dirpath = dirname;
+    fs::path dirpath(dirname);
     iNode *cur = root_;
     iNode *parent = NULL;
     for (auto f : dirpath) {
+      if (f.string() == "/") {
+        continue; // skip the leading '/'
+      }
       iNode *p = NULL;
       if (cur->is_dir()) {
-        p = staitc_cast<Dir *>(cur)->find(f);
+        p = static_cast<Dir *>(cur)->search(f.string());
       } else {
         return false;
       }
       if (p == NULL) {
         if (create_if_missing) {
-          p = new Dir(f);
-          cur->add(f, d);
+          p = new Dir(f.string());
+          static_cast<Dir *>(cur)->add(f.string(), p);
         } else {
           return false;
         }
@@ -164,19 +183,19 @@ public: // public accessors
   bool CreateDir(const string &dirname) {
     fs::path dirpath = dirname;
     iNode *cur = root_;
-    navigate(dirname, &cur, NULL, true);
-    return true;
+    iNode *parent = NULL;
+    return navigate(dirname, &cur, &parent, true);
   }
   bool DeleteDir(const string &dirname) {
     fs::path dirpath = dirname;
     iNode *cur = root_;
     iNode *parent = NULL;
-    bool st = navigate(dirpath, &cur, &parent, false);
-    if (st == false || cur->type == TYPE_FILE) {
+    bool st = navigate(dirpath.string(), &cur, &parent, false);
+    if (st == false || !cur->is_dir()) {
       return false;
     }
     // delete the directory
-    parent->del(cur->get_name());
+    static_cast<Dir *>(parent)->del(cur->get_name());
     return true;
   }
   bool NewFile(const string &path) {
@@ -185,11 +204,12 @@ public: // public accessors
     fs::path filename = filepath.filename();
 
     iNode *dir;
-    st = navigate(dirpath, &dir, NULL, true);
+    iNode *parent = NULL;
+    bool st = navigate(dirpath.string(), &dir, &parent, true);
 
     if (st == true && dir->is_dir()) {
-      File *fd = new File(filename);
-      dir->add(filename, fd);
+      File *fd = new File(filename.string());
+      static_cast<Dir *>(dir)->add(filename.string(), fd);
       return true;
     } else {
       return false;
@@ -201,15 +221,24 @@ public: // public accessors
     fs::path filename = filepath.filename();
 
     iNode *dir;
-    st = navigate(dirpath, &dir, NULL, false);
+    iNode *parent = NULL;
+    bool st = navigate(dirpath.string(), &dir, &parent, false);
 
     if (st == true && dir->is_dir()) {
-      return static_cast<Dir *>(dir)->del(filename);
+      return static_cast<Dir *>(dir)->del(filename.string());
     } else {
       return false;
     }
   }
-  bool OpenFile(const string &path) {}
+  File *OpenFile(const string &path) {
+    iNode *f;
+    iNode *parent = NULL;
+    bool st = navigate(path, &f, &parent, false);
+    if (st || f->is_dir()) {
+      return NULL;
+    }
+    return static_cast<File *>(f);
+  }
 
 public:
   iNode *root_; // the root directory
@@ -217,8 +246,16 @@ public:
 
 int main() {
   {
+    char input[128] = "1234567890ABCDEF";
     FileSystem fs;
     fs.CreateDir("/home/hluo/");
     fs.NewFile("/home/hluo/work");
+    FileSystem::File *fd = fs.OpenFile("/home/hluo/work");
+    assert(fd != NULL);
+    fd->Write(0, 16, input);
+    char rbuf[128] = {0};
+    fd->Read(4, 8, rbuf);
+
+    cout << rbuf << endl;
   }
 }
