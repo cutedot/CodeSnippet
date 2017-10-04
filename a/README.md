@@ -12,9 +12,9 @@
 - [x] HouseRobberWithIndex
 - [x] MaximumSquare
 - [x] RegularExpression
-- [ ] StringPyramidsTransitionMatrix
+- [x] StringPyramidsTransitionMatrix
 - [x] CircularBuffer
-- [ ] FileSystem
+- [x] FileSystem
 - [x] Puzzle
 - [x] TwoDIterator
 - [ ] CSVParser
@@ -25,7 +25,7 @@
 - [ ] WaterLand
 - [x] MeetingRooms
 - [x] MinimumNumberOfGraphNode
-- [ ] NumberOfConnectedComponents
+- [x] NumberOfConnectedComponents
 - [ ] RectangleIntersections
 - [x] PalindromePairs
 - [x] CalculatorII
