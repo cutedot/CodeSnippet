@@ -1,16 +1,17 @@
-#include <boost/filesystem.hpp>
+#include <boost/algorithm/string.hpp>
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
 #include <string>
 #include <unordered_map>
 #include <vector>
+
+using namespace std;
+
 //
 // An implementation of mini file system that supports basic functionality
 // NOTE: this is not POSIX compatible
 //
-using namespace std;
-namespace fs = boost::filesystem;
 
 class FileSystem {
 public: // file system essentials
@@ -113,7 +114,6 @@ public: // file system essentials
     }
     bool add(string name, iNode *item) {
       if (dir_tbl_.find(name) == dir_tbl_.end()) {
-        cout << name << endl;
         dir_tbl_[name] = item;
         return true;
       } else {
@@ -143,25 +143,24 @@ private:
   void destroy(iNode *root) { delete static_cast<Dir *>(root_); }
 
   // navigate to a directory
-  bool navigate(const string &dirname, iNode **leaf, iNode **parent_dir,
+  bool navigate(vector<string> &path, iNode **leaf, iNode **parent_dir,
                 bool create_if_missing) {
-    fs::path dirpath(dirname);
     iNode *cur = root_;
     iNode *parent = NULL;
-    for (auto f : dirpath) {
-      if (f.string() == "/") {
-        continue; // skip the leading '/'
+    for (auto f : path) {
+      if (f.size() == 0) {
+        continue;
       }
       iNode *p = NULL;
       if (cur->is_dir()) {
-        p = static_cast<Dir *>(cur)->search(f.string());
+        p = static_cast<Dir *>(cur)->search(f);
       } else {
         return false;
       }
       if (p == NULL) {
         if (create_if_missing) {
-          p = new Dir(f.string());
-          static_cast<Dir *>(cur)->add(f.string(), p);
+          p = new Dir(f);
+          static_cast<Dir *>(cur)->add(f, p);
         } else {
           return false;
         }
@@ -181,16 +180,19 @@ public:
 public: // public accessors
   // here to help with splitting the path string, I use the filesystem library.
   bool CreateDir(const string &dirname) {
-    fs::path dirpath = dirname;
+    vector<string> dirpath;
+    boost::split(dirpath, dirname, boost::is_any_of("/"));
     iNode *cur = root_;
     iNode *parent = NULL;
-    return navigate(dirname, &cur, &parent, true);
+    return navigate(dirpath, &cur, &parent, true);
   }
-  bool DeleteDir(const string &dirname) {
-    fs::path dirpath = dirname;
+
+  bool DeleteDir(const string &dir) {
+    vector<string> dirpath;
+    boost::split(dirpath, dir, boost::is_any_of("/"));
     iNode *cur = root_;
     iNode *parent = NULL;
-    bool st = navigate(dirpath.string(), &cur, &parent, false);
+    bool st = navigate(dirpath, &cur, &parent, false);
     if (st == false || !cur->is_dir()) {
       return false;
     }
@@ -198,43 +200,49 @@ public: // public accessors
     static_cast<Dir *>(parent)->del(cur->get_name());
     return true;
   }
-  bool NewFile(const string &path) {
-    fs::path filepath = path;
-    fs::path dirpath = filepath.parent_path();
-    fs::path filename = filepath.filename();
 
+  bool NewFile(const string &path) {
+    vector<string> dirpath;
+    boost::split(dirpath, path, boost::is_any_of("/"));
+    string filename = dirpath.back();
+    dirpath.pop_back();
     iNode *dir;
     iNode *parent = NULL;
-    bool st = navigate(dirpath.string(), &dir, &parent, true);
+    bool st = navigate(dirpath, &dir, &parent, true);
 
     if (st == true && dir->is_dir()) {
-      File *fd = new File(filename.string());
-      static_cast<Dir *>(dir)->add(filename.string(), fd);
+      File *fd = new File(filename);
+      static_cast<Dir *>(dir)->add(filename, fd);
       return true;
     } else {
       return false;
     }
   }
+
   bool DeleteFile(const string &path) {
-    fs::path filepath = path;
-    fs::path dirpath = filepath.parent_path();
-    fs::path filename = filepath.filename();
+    vector<string> dirpath;
+    boost::split(dirpath, path, boost::is_any_of("/"));
+    string filename = dirpath.back();
 
     iNode *dir;
     iNode *parent = NULL;
-    bool st = navigate(dirpath.string(), &dir, &parent, false);
+    bool st = navigate(dirpath, &dir, &parent, false);
 
     if (st == true && dir->is_dir()) {
-      return static_cast<Dir *>(dir)->del(filename.string());
+      return static_cast<Dir *>(dir)->del(filename);
     } else {
       return false;
     }
   }
+
   File *OpenFile(const string &path) {
+    vector<string> filepath;
+    boost::split(filepath, path, boost::is_any_of("/"));
+
     iNode *f;
     iNode *parent = NULL;
-    bool st = navigate(path, &f, &parent, false);
-    if (st || f->is_dir()) {
+    bool st = navigate(filepath, &f, &parent, false);
+    if (st == false || f->is_dir()) {
       return NULL;
     }
     return static_cast<File *>(f);
@@ -255,7 +263,11 @@ int main() {
     fd->Write(0, 16, input);
     char rbuf[128] = {0};
     fd->Read(4, 8, rbuf);
-
+    cout << rbuf << endl;
+    fd->Write(32, 16, input);
+    fd->Read(4, 8, rbuf);
+    cout << rbuf << endl;
+    fd->Read(40, 8, rbuf);
     cout << rbuf << endl;
   }
 }
