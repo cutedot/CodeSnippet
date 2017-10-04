@@ -15,7 +15,7 @@
 - [ ] StringPyramidsTransitionMatrix
 - [x] CircularBuffer
 - [ ] FileSystem
-- [ ] Puzzle
+- [x] Puzzle
 - [x] TwoDIterator
 - [ ] CSVParser
 - [ ] DisplayPageList

@@ -1,5 +1,10 @@
 # Just a list of stupid mistakes
 -------
+
+Overall, practicing for Airbnb interview questions is definitely more fun than
+solving those leetcode questions. Here are a list of stupid mistakes I made as
+well as a set of templates I summarized during the preparation.
+
 1. pop item from queue:
 ```cpp
 // this is FIFO queue so push to back and pop from front
