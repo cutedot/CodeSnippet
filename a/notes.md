@@ -80,3 +80,9 @@ while (!pq.empty()) {
   }
 }
 ```
+
+8. Representation of a graph
+- The most generic way is to use `map<int, set<int>>` so we can handle discrete
+  keys.
+- Simpler way would be just to use `vector<vector<int>>` assume all nodes are
+  present which may not be true in cases like alien dictionary

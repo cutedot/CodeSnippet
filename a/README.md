@@ -1,7 +1,7 @@
 # List of some interesting interview questions
 ---
 
-- [ ] AlienDictionary
+- [x] AlienDictionary
 - [x] PreferenceList
 - [x] BoggleGame
 - [x] FlightTicket
