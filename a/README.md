@@ -29,7 +29,7 @@
 - [ ] RectangleIntersections
 - [x] PalindromePairs
 - [x] CalculatorII
-- [ ] GuessNumber
+- [x] GuessNumber
 - [x] MiniParser
 - [ ] RoundedNumber
 - [x] PatternMatch
