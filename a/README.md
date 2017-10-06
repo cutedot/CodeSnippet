@@ -18,10 +18,10 @@
 - [x] Puzzle
 - [x] TwoDIterator
 - [ ] CSVParser
-- [ ] DisplayPageList
+- [x] DisplayPageList
 - [ ] IPtoCidr
-- [ ] TextJustification
-- [ ] TravelBuddyList
+- [x] TextJustification
+- [x] TravelBuddyList
 - [ ] WaterLand
 - [x] MeetingRooms
 - [x] MinimumNumberOfGraphNode

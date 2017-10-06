@@ -1,0 +1,149 @@
+#include <iostream>
+#include <list>
+#include <sstream>
+#include <string>
+#include <unordered_set>
+#include <vector>
+
+using namespace std;
+
+// Pagination:
+// 1) show 12 results per page, but avoid the same host dominate the
+//   results on a page,
+// 2) a host shows up at most once in a page if possible,
+// 3) otherwise, preserve the ordering
+// input_csv_array = [
+//   "host_id,listing_id,score,city",
+//   "1,28,300.1,San Francisco",
+//   "4,5,209.1,San Francisco",
+//   "20,7,208.1,San Francisco",
+//   "23,8,207.1,San Francisco",
+//   "16,10,206.1,Oakland",
+//   "1,16,205.1,San Francisco",
+//   "1,31,204.6,San Francisco",
+//   "6,29,204.1,San Francisco",
+//   "7,20,203.1,San Francisco",
+//   "8,21,202.1,San Francisco",
+//   "2,18,201.1,San Francisco",
+//   "2,30,200.1,San Francisco",
+//   "15,27,109.1,Oakland",
+//   "10,13,108.1,Oakland",
+//   "11,26,107.1,Oakland",
+//   "12,9,106.1,Oakland",
+//   "13,1,105.1,Oakland",
+//   "22,17,104.1,Oakland",
+//   "1,2,103.1,Oakland",
+//   "28,24,102.1,Oakland",
+//   "18,14,11.1,San Jose",
+//   "6,25,10.1,Oakland",
+//   "19,15,9.1,San Jose",
+//   "3,19,8.1,San Jose",
+//   "3,11,7.1,Oakland",
+//   "27,12,6.1,Oakland",
+//   "1,3,5.1,Oakland",
+//   "25,4,4.1,San Jose",
+//   "5,6,3.1,San Jose",
+//   "29,22,2.1,San Jose",
+//   "30,23,1.1,San Jose"
+//  ]
+
+int extractHostId(string s) {
+  int host_id;
+  istringstream line(s);
+  line >> host_id;
+  return host_id;
+}
+
+bool compare_score(const string &lhs, const string &rhs) {
+  istringstream lss(lhs), rss(rhs);
+  int lscore, rscore;
+  char comma;
+  lss >> lscore >> comma >> lscore >> comma >> lscore;
+  rss >> rscore >> comma >> rscore >> comma >> rscore;
+  return lscore > rscore;
+}
+
+vector<vector<string>> pagination(vector<string> &input, int page_limit) {
+  vector<vector<string>> res;
+  list<string> listing;
+  for (auto s : input) {
+    listing.push_back(s);
+  }
+  listing.sort(compare_score);
+  /*
+    for (auto it = listing.begin(); it != listing.end(); ++it) {
+      cout << *it << endl;
+    }
+  */
+  while (!listing.empty()) {
+    auto it = listing.begin();
+    vector<string> cur_page;
+    unordered_set<int> hosts;
+    // first pass
+    while (it != listing.end() && cur_page.size() < page_limit) {
+      int id = extractHostId(*it);
+      if (hosts.find(id) == hosts.end()) {
+        cur_page.push_back(*it);
+        it = listing.erase(it);
+        hosts.insert(id);
+      } else {
+        // skip this one
+        ++it;
+      }
+    }
+    // second pass, has to add dups into it
+    it = listing.begin();
+    while (it != listing.end() && cur_page.size() < page_limit) {
+      cur_page.push_back(*it);
+      it = listing.erase(it);
+    }
+
+    res.push_back(cur_page);
+  }
+  return res;
+}
+
+int main() {
+  vector<string> input_csv_array{"host_id,listing_id,score,city",
+                                 "1,28,300.1,San Francisco",
+                                 "4,5,209.1,San Francisco",
+                                 "20,7,208.1,San Francisco",
+                                 "23,8,207.1,San Francisco",
+                                 "16,10,206.1,Oakland",
+                                 "1,16,205.1,San Francisco",
+                                 "1,31,204.6,San Francisco",
+                                 "6,29,204.1,San Francisco",
+                                 "7,20,203.1,San Francisco",
+                                 "8,21,202.1,San Francisco",
+                                 "2,18,201.1,San Francisco",
+                                 "2,30,200.1,San Francisco",
+                                 "15,27,109.1,Oakland",
+                                 "10,13,108.1,Oakland",
+                                 "11,26,107.1,Oakland",
+                                 "12,9,106.1,Oakland",
+                                 "13,1,105.1,Oakland",
+                                 "22,17,104.1,Oakland",
+                                 "1,2,103.1,Oakland",
+                                 "28,24,102.1,Oakland",
+                                 "18,14,11.1,San Jose",
+                                 "6,25,10.1,Oakland",
+                                 "19,15,9.1,San Jose",
+                                 "3,19,8.1,San Jose",
+                                 "3,11,7.1,Oakland",
+                                 "27,12,6.1,Oakland",
+                                 "1,3,5.1,Oakland",
+                                 "25,4,4.1,San Jose",
+                                 "5,6,3.1,San Jose",
+                                 "29,22,2.1,San Jose",
+                                 "30,23,1.1,San Jose"};
+
+  vector<vector<string>> res = pagination(input_csv_array, 6);
+
+  for (int i = 0; i < res.size(); ++i) {
+    cout << "=== Page " << i << " ===" << endl;
+    for (auto l : res[i]) {
+      cout << l << endl;
+    }
+    cout << "================" << endl;
+  }
+}
