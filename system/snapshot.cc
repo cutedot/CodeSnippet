@@ -115,8 +115,8 @@ int main() {
     get(c, snap3) => cv2
     get(b, snap2) => null
     deleteSnapshot(snap2)
-    get(a, snap3) => av1
-    get(b, snap3) => bv1
+    get(a, snap3) => av2
+    get(b, snap3) => null
 
 */
 }
