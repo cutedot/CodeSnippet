@@ -86,3 +86,31 @@ while (!pq.empty()) {
   keys.
 - Simpler way would be just to use `vector<vector<int>>` assume all nodes are
   present which may not be true in cases like alien dictionary
+
+9. Sliding window template
+```
+// two helper functions
+bool isValid();;
+bool updateStatus();
+
+void slidingWindow(array) {
+  // left and right boundary
+  int l = 0;
+  int r = 0;
+  
+  while (r < array.size()) {
+    while (r < array.size() && !isValid()) {
+      updateStatus();
+      ++r;
+    }
+    if (isValid()) {
+      break;
+    }
+    while (l < r && isValid()) {
+      updateStatus();
+      ++l;
+    }
+  }
+}
+
+```
