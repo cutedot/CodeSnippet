@@ -103,7 +103,8 @@ void slidingWindow(array) {
       updateStatus();
       ++r;
     }
-    if (isValid()) {
+    if (!isValid()) {
+      // must have reached the end of array
       break;
     }
     while (l < r && isValid()) {
