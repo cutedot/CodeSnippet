@@ -21,6 +21,7 @@ list<Segment>::iterator mergeSegment(list<Segment>::iterator iter,
   return iter;
 }
 
+// Solution 1:
 // ASSUMPTION: water will flow equally to the left and right if it's a local
 // peak
 void getWaterLevel(list<Segment> &level, int pos, double amount) {
@@ -93,6 +94,41 @@ void getWaterLevel(list<Segment> &level, int pos, double amount) {
   }
 }
 
+// Solution 2:
+// ASSUMPTION: water always flows to the left valley
+void getWaterLevel2(list<Segment> &level, int pos, double amount) {
+  list<Segment>::iterator valley;
+  for (auto it = level.begin(); it != level.end() && it->x <= pos; ++it) {
+    valley = it;
+  }
+  while (amount > 0) {
+    while (next(valley)->h < valley->h)
+      ++valley;
+    while (prev(valley)->h < valley->h)
+      --valley;
+
+    // now valley points to the local minimum
+    int valley_width = next(valley)->x - valley->x;
+    double valley_height = min(prev(valley)->h, next(valley)->h);
+    double valley_depth = valley_height - valley->h;
+    int valley_cap = valley_width * valley_depth;
+
+    cout << valley->h << endl;
+    cout << valley_width << " " << valley_depth << endl;
+
+    if (valley_cap > amount) {
+      // fill the valley and we are done
+      valley->h += amount / valley_width;
+      amount = 0;
+    } else {
+      // fill the valley and goto next iteration
+      amount -= valley_cap;
+      valley->h = valley_height;
+      valley = mergeSegment(valley, level);
+    }
+  }
+}
+
 void printLevel(list<Segment> &level) {
   for (auto it = level.begin(); it != level.end(); ++it) {
     for (int i = it->x; i < next(it)->x; ++i) {
@@ -100,12 +136,14 @@ void printLevel(list<Segment> &level) {
       for (double j = 0; j < it->h; j += 0.25) {
         cout << "#";
       }
+      cout << "  " << it->h << endl;
       cout << endl;
     }
   }
 }
 
 int main() {
+  /*
   {
     list<Segment> level{{0, 5},  {1, 0},  {2, 3},  {5, 4},  {7, 1},  {8, 3},
                         {9, 2},  {10, 0}, {12, 1}, {13, 3}, {14, 4}, {15, 3},
@@ -119,6 +157,27 @@ int main() {
     getWaterLevel(level, 15, 3);
 
     cout << endl << "After droping another 3 liter water" << endl;
+    printLevel(level);
+
+    getWaterLevel(level, 15, 41);
+
+    cout << endl << "After droping another 41 (47 total) liter water" << endl;
+    printLevel(level);
+  }
+  */
+  {
+    list<Segment> level{{0, 5},  {1, 0},  {2, 3},  {5, 4},  {7, 1},  {8, 3},
+                        {9, 2},  {10, 0}, {12, 1}, {13, 3}, {14, 4}, {15, 3},
+                        {16, 2}, {17, 4}, {18, 3}, {20, 6}};
+    printLevel(level);
+    getWaterLevel2(level, 15, 3);
+
+    cout << endl << "After droping 3 liter water" << endl;
+    printLevel(level);
+
+    getWaterLevel(level, 15, 26);
+
+    cout << endl << "After droping another 26 (29 total) liter water" << endl;
     printLevel(level);
   }
 }
