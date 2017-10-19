@@ -15,7 +15,7 @@ vector<float> roundNumber(vector<float> ary) {
     tmp += ary[i];
     low_sum += floor(ary[i]);
     ret.push_back(floor(ary[i]));
-    diff.push_back(make_pair(ary[i] - floor(ary[i]), i));
+    diff.push_back(make_pair(abs(ary[i] - floor(ary[i])), i));
   }
   sum = round(tmp);
   int rem = sum - low_sum;
