@@ -15,6 +15,7 @@ func main() {
 	// accept connection on port
 	conn, _ := ln.Accept()
 
+	fmt.Println("Client connected...")
 	// run loop forever (or until ctrl-c)
 	for {
 		// will listen for message to process ending in newline (\n)
